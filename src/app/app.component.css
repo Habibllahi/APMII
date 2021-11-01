@@ -20,6 +20,10 @@
     -webkit-animation: spin 1000ms infinite linear;
     animation: spin 1000ms infinite linear;
 }
+
+.router-link-active {
+  background-color: #007ACC;
+}
 @-webkit-keyframes spin {
     0% {
         -webkit-transform: rotate(0deg);
