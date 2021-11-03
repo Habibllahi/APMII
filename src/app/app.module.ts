@@ -28,7 +28,6 @@ import { AppRouterModule } from './app-router.module';
     MessageModule,
     SharedModule,
     AppRouterModule,
-
   ],
   declarations: [
     AppComponent,

@@ -8,7 +8,7 @@
       <a class="nav-link" [routerLink]="['products']" routerLinkActive="router-link-active" >Product List</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link">Add Product</a>
+      <a class="nav-link" [routerLink]="['products',0,'edit']" routerLinkActive="router-link-active" >Add Product</a>
     </li>
   </ul>
   <ul class="navbar-nav ml-auto">
@@ -21,7 +21,7 @@
     </li>
     <li class="nav-item"
         *ngIf="!isLoggedIn">
-      <a class="nav-link">Log In</a>
+      <a class="nav-link" [routerLink]="['users/login']" routerLinkActive="router-link-active" >Log In</a>
     </li>
     <li class="nav-item"
         *ngIf="isLoggedIn">

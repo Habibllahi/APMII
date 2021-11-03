@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { Product } from './product';
 import { ProductService } from './product.service';
 
@@ -7,14 +8,22 @@ import { ProductService } from './product.service';
   templateUrl: './product-detail.component.html',
   styleUrls: ['./product-detail.component.css']
 })
-export class ProductDetailComponent implements OnInit {
+export class ProductDetailComponent implements OnInit, OnDestroy {
   pageTitle = 'Product Detail';
   product!: Product;
   errorMessage!: string;
+  routeSub!: Subscription
+  productSub!: Subscription
 
-  constructor(private productService: ProductService) { }
+  constructor(private productService: ProductService, private activatedRoute: ActivatedRoute) { }
+
+  ngOnDestroy(): void {
+    this.routeSub.unsubscribe();
+    this.productSub.unsubscribe()
+  }
+
   ngOnInit(): void {
-    throw new Error('Method not implemented.');
+    this.getActivatedRouteParameter()
   }
 
   getProduct(id: number): void {
@@ -32,5 +41,31 @@ export class ProductDetailComponent implements OnInit {
     } else {
       this.pageTitle = 'No product found';
     }
+  }
+
+  getActivatedRouteParameter(){
+    this.routeSub = this.activatedRoute.paramMap.subscribe(
+      (param) => {
+        this.productSub = this.productService.getProduct(Number(param.get("id"))).subscribe(
+          (product)=>{
+            this.product = product;
+          },
+          (error: Error)=>{
+            console.log(error.message);
+
+          },
+          ()=>{
+            console.info("completed listening to route parameter from product details")
+          }
+        );
+      },
+      (error: Error)=>{
+        console.log(error.message);
+
+      },
+      ()=>{
+        console.info("completed getting product")
+      }
+    )
   }
 }
