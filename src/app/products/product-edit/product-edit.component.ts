@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { MessageService } from '../../messages/message.service';
 
@@ -9,14 +11,26 @@ import { ProductService } from '../product.service';
   templateUrl: './product-edit.component.html',
   styleUrls: ['./product-edit.component.css']
 })
-export class ProductEditComponent {
+export class ProductEditComponent implements OnInit, OnDestroy {
   pageTitle = 'Product Edit';
   errorMessage!: string;
 
   product!: Product;
 
+  routeSub!: Subscription;
+
+  productSub!: Subscription
+
   constructor(private productService: ProductService,
-              private messageService: MessageService) { }
+              private messageService: MessageService, private activatedRoute: ActivatedRoute,
+              private route: Router) { }
+  ngOnInit(): void {
+    this.getActivatedRouteParameter();
+  }
+  ngOnDestroy(): void {
+    this.routeSub.unsubscribe();
+    this.productSub.unsubscribe();
+  }
 
   getProduct(id: number): void {
     this.productService.getProduct(id).subscribe({
@@ -51,6 +65,7 @@ export class ProductEditComponent {
         });
       }
     }
+    this.route.navigate(['/products'])
   }
 
   saveProduct(): void {
@@ -69,6 +84,7 @@ export class ProductEditComponent {
     } else {
       this.errorMessage = 'Please correct the validation errors.';
     }
+    this.route.navigate(['/products'])
   }
 
   onSaveComplete(message?: string): void {
@@ -77,5 +93,31 @@ export class ProductEditComponent {
     }
 
     // Navigate back to the product list
+  }
+
+  getActivatedRouteParameter(){
+    this.routeSub = this.activatedRoute.paramMap.subscribe(
+      (param) => {
+        this.productSub = this.productService.getProduct(Number(param.get("id"))).subscribe(
+          (product)=>{
+            this.product = product;
+          },
+          (error: Error)=>{
+            console.log(error.message);
+
+          },
+          ()=>{
+            console.info("completed listening to route parameter from product details")
+          }
+        );
+      },
+      (error: Error)=>{
+        console.log(error.message);
+
+      },
+      ()=>{
+        console.info("completed getting product")
+      }
+    )
   }
 }

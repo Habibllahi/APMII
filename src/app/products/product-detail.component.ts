@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Product } from './product';
 import { ProductService } from './product.service';
@@ -15,7 +15,8 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
   routeSub!: Subscription
   productSub!: Subscription
 
-  constructor(private productService: ProductService, private activatedRoute: ActivatedRoute) { }
+  constructor(private productService: ProductService, private activatedRoute: ActivatedRoute,
+     private route: Router) { }
 
   ngOnDestroy(): void {
     this.routeSub.unsubscribe();
@@ -68,4 +69,5 @@ export class ProductDetailComponent implements OnInit, OnDestroy {
       }
     )
   }
+
 }

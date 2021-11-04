@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { Product } from './product';
 import { ProductService } from './product.service';
@@ -8,18 +9,19 @@ import { ProductService } from './product.service';
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
-export class ProductListComponent implements OnInit {
+export class ProductListComponent implements OnInit, OnDestroy {
   pageTitle = 'Product List';
   imageWidth = 50;
   imageMargin = 2;
   showImage = false;
   errorMessage = '';
+  sub !: Subscription
+  private _listFilter = '';
 
-  _listFilter = '';
-  get listFilter(): string {
+  public get listFilter(): string {
     return this._listFilter;
   }
-  set listFilter(value: string) {
+  public set listFilter(value: string) {
     this._listFilter = value;
     this.filteredProducts = this.listFilter ? this.performFilter(this.listFilter) : this.products;
   }
@@ -27,16 +29,23 @@ export class ProductListComponent implements OnInit {
   filteredProducts: Product[] = [];
   products: Product[] = [];
 
-  constructor(private productService: ProductService, private route: Router) { }
+  constructor(private productService: ProductService, private route: Router, private activatedRoute: ActivatedRoute) { }
+  ngOnDestroy(): void {
+    this.sub.unsubscribe();
+  }
 
   ngOnInit(): void {
-    this.productService.getProducts().subscribe({
+    this.showImageBaseOnQueryParam();
+    this.listFilterBaseOnQueryParam();
+    this.sub = this.productService.getProducts().subscribe({
       next: products => {
         this.products = products;
         this.filteredProducts = this.performFilter(this.listFilter);
       },
       error: err => this.errorMessage = err
     });
+
+
   }
 
   performFilter(filterBy: string): Product[] {
@@ -47,6 +56,20 @@ export class ProductListComponent implements OnInit {
 
   toggleImage(): void {
     this.showImage = !this.showImage;
+  }
+
+  public showImageBaseOnQueryParam(){
+    let imageWasShown: string | null = this.activatedRoute.snapshot.queryParamMap.get("showImage");
+    if(imageWasShown){
+      this.showImage = imageWasShown === "true"? true : false
+    }
+  }
+
+  public listFilterBaseOnQueryParam(){
+    let listFliter: string | null = this.activatedRoute.snapshot.queryParamMap.get("filterBy");
+    if(listFliter){
+      this.listFilter = listFliter
+    }
   }
 
 }
