@@ -13,12 +13,16 @@ const routes: Routes = [
   {
     path: 'products/:id',
     component: ProductDetailComponent,
-    resolve: ProductResolver
+    resolve: {
+      resolvedProduct: ProductResolver
+    }
   },
   {
     path: 'products/:id/edit',
     component: ProductEditComponent,
-    resolve: ProductResolver
+    resolve: {
+      resolvedProduct: ProductResolver
+    }
   }
 ]
 

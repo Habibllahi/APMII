@@ -1,5 +1,5 @@
 /* Defines the product entity */
-export interface Product {
+export type Product = {
   id: number;
   productName: string;
   productCode: string;
@@ -12,7 +12,7 @@ export interface Product {
   imageUrl: string;
 }
 
-export interface ProductResolved {
-  product: Product;
-  error?: any;
+export type ProductResolved = {
+  product: Product | undefined;
+  error?: string | undefined;
 }
