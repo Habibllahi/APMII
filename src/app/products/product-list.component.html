@@ -59,7 +59,7 @@
               </pm-star>
             </td>
             <td>
-              <button class="btn btn-outline-primary btn-sm" [routerLink]="['/products',product.id,'edit']" >
+              <button class="btn btn-outline-primary btn-sm" [routerLink]="['/products',product.id,'edit']" [queryParams]="{filterBy: listFilter, showImage: showImage}" >
                 Edit
               </button>
             </td>

@@ -3,12 +3,16 @@ import { RouterModule, Routes } from '@angular/router';
 import { ProductDetailComponent } from './product-detail.component';
 import { ProductEditComponent } from './product-edit/product-edit.component';
 import { ProductListComponent } from './product-list.component';
+import { ProductListResolver } from './product-list.resolver';
 import { ProductResolver } from './product.resolver';
 
 const routes: Routes = [
   {
     path: 'products',
-    component: ProductListComponent
+    component: ProductListComponent,
+    resolve: {
+      resolvedProducts: ProductListResolver
+    }
   },
   {
     path: 'products/:id',

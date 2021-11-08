@@ -9,14 +9,15 @@ import { ProductService } from './product.service';
   templateUrl: './product-list.component.html',
   styleUrls: ['./product-list.component.css']
 })
-export class ProductListComponent implements OnInit, OnDestroy {
+export class ProductListComponent implements OnInit {
   pageTitle = 'Product List';
   imageWidth = 50;
   imageMargin = 2;
   showImage = false;
   errorMessage = '';
-  sub !: Subscription
   private _listFilter = '';
+    filteredProducts: Product[] = [];
+  products: Product[] = [];
 
   public get listFilter(): string {
     return this._listFilter;
@@ -25,33 +26,17 @@ export class ProductListComponent implements OnInit, OnDestroy {
     this._listFilter = value;
     this.filteredProducts = this.listFilter ? this.performFilter(this.listFilter) : this.products;
   }
-
-  filteredProducts: Product[] = [];
-  products: Product[] = [];
-
-  constructor(private productService: ProductService, private route: Router, private activatedRoute: ActivatedRoute) { }
-  ngOnDestroy(): void {
-    this.sub.unsubscribe();
-  }
+  constructor(private productService: ProductService, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
+    this.getResolvedProducts();
     this.showImageBaseOnQueryParam();
     this.listFilterBaseOnQueryParam();
-    this.sub = this.productService.getProducts().subscribe({
-      next: products => {
-        this.products = products;
-        this.filteredProducts = this.performFilter(this.listFilter);
-      },
-      error: err => this.errorMessage = err
-    });
-
-
   }
 
   performFilter(filterBy: string): Product[] {
     filterBy = filterBy.toLocaleLowerCase();
-    return this.products.filter((product: Product) =>
-      product.productName.toLocaleLowerCase().indexOf(filterBy) !== -1);
+    return this.products.filter((product: Product) => product.productName.toLocaleLowerCase().indexOf(filterBy) !== -1);
   }
 
   toggleImage(): void {
@@ -69,6 +54,17 @@ export class ProductListComponent implements OnInit, OnDestroy {
     let listFliter: string | null = this.activatedRoute.snapshot.queryParamMap.get("filterBy");
     if(listFliter){
       this.listFilter = listFliter
+    }
+  }
+
+  public getResolvedProducts(): void {
+    const data = this.activatedRoute.snapshot.data['resolvedProducts'];
+    if(data.error){
+      this.errorMessage = data.error;
+    }else{
+      this.products = data.products;
+      this.filteredProducts = this.products;
+
     }
   }
 

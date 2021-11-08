@@ -16,3 +16,8 @@ export type ProductResolved = {
   product: Product | undefined;
   error?: string | undefined;
 }
+
+export type ProductListResolved = {
+  products: Product[] | undefined;
+  error?: string | undefined;
+}

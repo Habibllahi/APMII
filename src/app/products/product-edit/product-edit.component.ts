@@ -17,19 +17,17 @@ export class ProductEditComponent implements OnInit, OnDestroy {
 
   product!: Product;
 
-  routeSub!: Subscription;
-
-  productSub!: Subscription
+  resolverSub!: Subscription;
 
   constructor(private productService: ProductService,
               private messageService: MessageService, private activatedRoute: ActivatedRoute,
               private route: Router) { }
-  ngOnInit(): void {
-    this.getActivatedRouteParameter();
-  }
+
   ngOnDestroy(): void {
-    this.routeSub.unsubscribe();
-    this.productSub.unsubscribe();
+    this.resolverSub.unsubscribe();
+  }
+  ngOnInit(): void {
+    this.getResolvedData();
   }
 
   getProduct(id: number): void {
@@ -65,7 +63,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
         });
       }
     }
-    this.route.navigate(['/products'])
+    this.route.navigate(['/products'],{queryParamsHandling:'preserve'})
   }
 
   saveProduct(): void {
@@ -84,7 +82,7 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     } else {
       this.errorMessage = 'Please correct the validation errors.';
     }
-    this.route.navigate(['/products'])
+    this.route.navigate(['/products'],{queryParamsHandling:'preserve'})
   }
 
   onSaveComplete(message?: string): void {
@@ -95,29 +93,17 @@ export class ProductEditComponent implements OnInit, OnDestroy {
     // Navigate back to the product list
   }
 
-  getActivatedRouteParameter(){
-    this.routeSub = this.activatedRoute.paramMap.subscribe(
-      (param) => {
-        this.productSub = this.productService.getProduct(Number(param.get("id"))).subscribe(
-          (product)=>{
-            this.product = product;
-          },
-          (error: Error)=>{
-            console.log(error.message);
-
-          },
-          ()=>{
-            console.info("completed listening to route parameter from product details")
-          }
-        );
-      },
-      (error: Error)=>{
-        console.log(error.message);
-
-      },
-      ()=>{
-        console.info("completed getting product")
+  getResolvedData(): void{
+    this.resolverSub = this.activatedRoute.data.subscribe(data => {
+      const resolvedData = data['resolvedProduct'];
+      if(resolvedData.error){
+        this.errorMessage = resolvedData.error
+      }else{
+        this.pageTitle = resolvedData.product.productName;
+        this.product = resolvedData.product;
       }
-    )
+    })
+
   }
+
 }
